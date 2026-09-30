@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "task-handoff-check"
+version = "0.1.0"
+description = "Check structured task handoffs for missing and contradictory claims."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+authors = [{name = "IT Custom Solution LLC"}]
+dependencies = []
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Topic :: Software Development :: Quality Assurance",
+]
+
+[project.scripts]
+task-handoff-check = "task_handoff_check.__main__:main"
+
+[project.urls]
+Repository = "https://github.com/itcustomsolution/task-handoff-check"
+Issues = "https://github.com/itcustomsolution/task-handoff-check/issues"
+
+[tool.setuptools]
+packages = ["task_handoff_check"]

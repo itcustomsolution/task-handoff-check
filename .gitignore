@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+build/
+dist/
+.DS_Store
+.env
+.env.*
+!.env.example
+*.pem
+*.p12
+secret*.json
+node_modules/

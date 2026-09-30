@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "objective": "Review the sample release notes",
+  "owner": "Sample Maintainer",
+  "status": "blocked",
+  "next_action": "Ask the sample maintainer to provide the changelog",
+  "inputs": [
+    {
+      "label": "changelog",
+      "path": "docs/changelog.md"
+    }
+  ],
+  "evidence": [],
+  "blockers": [
+    {
+      "description": "The sample changelog is missing",
+      "owner": "Sample Maintainer"
+    }
+  ],
+  "completion_criteria": [
+    {
+      "description": "All sample changes reviewed",
+      "met": false,
+      "evidence": []
+    }
+  ],
+  "updated_at": "2026-01-01T09:00:00Z"
+}
