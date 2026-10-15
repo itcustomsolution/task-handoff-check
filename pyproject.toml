@@ -10,10 +10,15 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = {file = "LICENSE"}
 authors = [{name = "IT Custom Solution LLC"}]
+keywords = ["handoff", "ai-agents", "workflow", "validation", "cli", "json"]
 dependencies = []
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Programming Language :: Python :: 3",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
   "Programming Language :: Python :: 3 :: Only",
   "Topic :: Software Development :: Quality Assurance",
 ]
@@ -22,6 +27,8 @@ classifiers = [
 task-handoff-check = "task_handoff_check.__main__:main"
 
 [project.urls]
+Homepage = "https://github.com/itcustomsolution/task-handoff-check"
+Changelog = "https://github.com/itcustomsolution/task-handoff-check/blob/main/CHANGELOG.md"
 Repository = "https://github.com/itcustomsolution/task-handoff-check"
 Issues = "https://github.com/itcustomsolution/task-handoff-check/issues"
 

@@ -1,5 +1,12 @@
 # task-handoff-check
 
+> Lint a task handoff (human or AI agent) for a missing owner, next step, blockers, done criteria or evidence before someone else picks it up.
+
+<!-- Badges: enable after first PyPI publish -->
+<!-- [![PyPI](https://img.shields.io/pypi/v/task-handoff-check)](https://pypi.org/project/task-handoff-check/) -->
+<!-- [![tests](https://github.com/itcustomsolution/task-handoff-check/actions/workflows/tests.yml/badge.svg)](https://github.com/itcustomsolution/task-handoff-check/actions/workflows/tests.yml) -->
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 Catch incomplete or contradictory task handoffs before someone else picks up
 the work. This small CLI and library checks an explicit JSON document for a
 clear owner, next action, blockers, completion criteria and evidence references.
@@ -25,7 +32,9 @@ The first two checks pass. The third exits 1 because it claims `complete` while
 listing an open blocker. All examples, people and references are fictional;
 referenced paths deliberately need not exist. The tool never opens them.
 
-To install a command in a virtual environment:
+After the first PyPI release: `pipx install task-handoff-check` (or `pip install task-handoff-check`).
+
+To install from source in a virtual environment:
 
 ```sh
 python -m venv .venv
@@ -173,3 +182,11 @@ python -m unittest discover -s tests -v
 Tests use synthetic inputs and temporary directories. CI covers Python 3.10,
 3.12 and 3.14 on Linux, plus Python 3.14 on macOS.
 See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Contributing
+
+Issues and small pull requests are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md). Run `python -m unittest discover -s tests` before opening a PR. Release history is in [CHANGELOG.md](CHANGELOG.md).
+
+## License
+
+MIT, see [LICENSE](LICENSE).
