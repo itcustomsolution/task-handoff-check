@@ -10,6 +10,9 @@ import unicodedata
 from urllib.parse import urlsplit
 
 MAX_HANDOFF_BYTES = 1024 * 1024
+# A deliberately broad cap covers the entire supported datetime calendar while
+# rejecting nonsensical option magnitudes before any int-to-float conversion.
+MAX_AGE_HOURS = 24 * 366 * 10000
 PLACEHOLDERS = {'tbd', 'todo', 'unknown', 'unassigned', 'n/a', 'none', '-', '?'}
 REQUIRED = {'schema_version', 'objective', 'owner', 'status', 'next_action',
             'inputs', 'evidence', 'blockers', 'completion_criteria'}
@@ -32,6 +35,13 @@ def _constant(value):
     raise HandoffError('nonfinite JSON numbers are not supported')
 
 
+def _finite_float(value):
+    number = float(value)
+    if not math.isfinite(number):
+        raise HandoffError('nonfinite JSON numbers are not supported')
+    return number
+
+
 def load_handoff(path):
     """Read one regular UTF-8 JSON file, up to 1 MiB. Reject final symlinks."""
     path = Path(path)
@@ -48,9 +58,20 @@ def load_handoff(path):
             contents = stream.read(MAX_HANDOFF_BYTES + 1)
         if len(contents) > MAX_HANDOFF_BYTES:
             raise HandoffError('handoff exceeds 1 MiB')
-        return json.loads(contents.decode('utf-8'), object_pairs_hook=_object, parse_constant=_constant)
-    except (OSError, ValueError, UnicodeError, RecursionError) as exc:
-        raise HandoffError('cannot read handoff JSON: ' + str(exc)) from exc
+        return json.loads(contents.decode('utf-8'), object_pairs_hook=_object,
+                          parse_constant=_constant, parse_float=_finite_float)
+    except HandoffError:
+        raise
+    except UnicodeDecodeError as exc:
+        raise HandoffError('handoff must contain valid UTF-8 JSON') from exc
+    except json.JSONDecodeError as exc:
+        raise HandoffError(f'invalid JSON at line {exc.lineno}, column {exc.colno}') from exc
+    except RecursionError as exc:
+        raise HandoffError('handoff JSON nesting is too deep') from exc
+    except OSError as exc:
+        raise HandoffError('cannot read handoff JSON: ' + (exc.strerror or 'file unavailable')) from exc
+    except ValueError as exc:
+        raise HandoffError('handoff contains an unsupported JSON value') from exc
     finally:
         if fd is not None:
             os.close(fd)
@@ -95,15 +116,17 @@ def _http_url(value):
 def validate_handoff(data, *, as_of=None, max_age_hours=None):
     """Return a JSON-compatible report. Optional freshness uses only supplied time.
 
-    ``as_of`` is a timestamp string. ``max_age_hours`` is a finite nonnegative
-    number and requires ``as_of``. Bad options raise HandoffError; invalid
+    ``as_of`` is a timestamp string. ``max_age_hours`` is an int or float in
+    the inclusive range 0..87,840,000 and requires ``as_of``. Booleans and
+    nonfinite floats are not accepted. Bad options raise HandoffError; invalid
     document fields appear in the returned issues list.
     """
     clock = _timestamp(as_of) if as_of is not None else None
     if max_age_hours is not None:
         if (clock is None or type(max_age_hours) not in (int, float)
-                or not math.isfinite(max_age_hours) or max_age_hours < 0):
-            raise HandoffError('max_age_hours requires as_of and a finite nonnegative number')
+                or not 0 <= max_age_hours <= MAX_AGE_HOURS
+                or (type(max_age_hours) is float and not math.isfinite(max_age_hours))):
+            raise HandoffError('max_age_hours requires as_of and a number from 0 to 87840000 hours')
     issues = []
     freshness = 'not_evaluated'
 

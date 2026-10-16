@@ -2,8 +2,6 @@
 
 > Lint a task handoff (human or AI agent) for a missing owner, next step, blockers, done criteria or evidence before someone else picks it up.
 
-<!-- Badges: enable after first PyPI publish -->
-<!-- [![PyPI](https://img.shields.io/pypi/v/task-handoff-check)](https://pypi.org/project/task-handoff-check/) -->
 <!-- [![tests](https://github.com/itcustomsolution/task-handoff-check/actions/workflows/tests.yml/badge.svg)](https://github.com/itcustomsolution/task-handoff-check/actions/workflows/tests.yml) -->
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -32,7 +30,9 @@ The first two checks pass. The third exits 1 because it claims `complete` while
 listing an open blocker. All examples, people and references are fictional;
 referenced paths deliberately need not exist. The tool never opens them.
 
-After the first PyPI release: `pipx install task-handoff-check` (or `pip install task-handoff-check`).
+The published 0.1.0 release is available with `pipx install task-handoff-check==0.1.0`
+(or `pip install task-handoff-check==0.1.0`). Use the source installation below
+for unreleased changes in this checkout.
 
 To install from source in a virtual environment:
 
@@ -119,8 +119,10 @@ python -m task_handoff_check examples/in-progress.json \
 ```
 
 This example passes exactly at the 24-hour boundary. One second later it is
-`stale`. `--max-age-hours` must be finite, nonnegative and accompanied by
-`--as-of`. Supplying `--as-of` requires a valid `updated_at` and rejects a future
+`stale`. `--max-age-hours` must be finite, from 0 through 87,840,000 inclusive,
+and accompanied by `--as-of`. The broad upper bound covers the full supported
+timestamp calendar; it does not establish a meaningful freshness policy for you.
+Supplying `--as-of` requires a valid `updated_at` and rejects a future
 update. `--as-of` alone compares chronology, without a maximum-age policy.
 
 Accepted timestamps use `YYYY-MM-DDTHH:MM:SS`, optional 1–6 fractional digits,
@@ -161,8 +163,12 @@ report = validate_handoff(
 ```
 
 `validate_handoff` returns issues for invalid documents and raises `HandoffError`
-for invalid freshness options. `load_handoff` raises `HandoffError` for input
-errors. Validation does not mutate the document.
+for invalid freshness options. The library accepts `max_age_hours` as an integer
+or float in the same inclusive range as the CLI; booleans and nonfinite values
+are rejected. `load_handoff` raises `HandoffError` for input errors, including
+numbers such as `1e999` that overflow Python's finite floating-point range.
+Validation does not mutate the document. Parser errors identify a location
+without repeating JSON content or the input filename.
 
 ## Limits and development
 
@@ -179,8 +185,11 @@ It never changes a task's state. See [SECURITY.md](SECURITY.md).
 python -m unittest discover -s tests -v
 ```
 
-Tests use synthetic inputs and temporary directories. CI covers Python 3.10,
-3.12 and 3.14 on Linux, plus Python 3.14 on macOS.
+Tests use synthetic inputs and temporary directories. The pull-request workflow
+is configured for Python 3.10, 3.12 and 3.14 on Linux, plus Python 3.14 on macOS.
+Configuration describes intended coverage; inspect the workflow run results for
+executed coverage. Local unreleased-fix verification used Python 3.14 on macOS;
+the other configured jobs have not been run for these fixes.
 See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Contributing
