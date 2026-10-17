@@ -42,7 +42,10 @@ def _finite_float(value):
 
 def load_handoff(path):
     """Read one regular UTF-8 JSON file, up to 1 MiB. Reject final symlinks."""
-    path = Path(path)
+    try:
+        path = Path(path)
+    except TypeError as exc:  # None, bytes, a number: a documented error, not a TypeError
+        raise HandoffError('handoff path must be a string or path-like object') from exc
     if '\x00' in str(path):
         raise HandoffError('handoff path is invalid (contains a NUL character)')
     fd = None

@@ -176,5 +176,18 @@ class DocumentedCoverage(unittest.TestCase):
         self.assertIn('not executed by this change', readme)
 
 
+
+class WrongPathTypes(unittest.TestCase):
+    # r2 audit observation: load_handoff(None) raised TypeError instead of the documented HandoffError.
+    def test_a_path_that_is_not_text_or_path_like_is_a_handoff_error(self):
+        class BytesPath:
+            def __fspath__(self):
+                return b'handoff.json'
+        for bad in (None, b'handoff.json', 3, object(), BytesPath()):
+            with self.subTest(bad=type(bad).__name__):
+                with self.assertRaises(HandoffError):
+                    load_handoff(bad)
+
+
 if __name__ == '__main__':
     unittest.main()
