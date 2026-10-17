@@ -51,8 +51,18 @@ class Reader(unittest.TestCase):
         self.assertNotIn('SENTINEL', str(caught.exception))
         with self.assertRaisesRegex(HandoffError, 'UTF-8'):
             self.load(b'{"x": "\xff"}')
-        with self.assertRaisesRegex(HandoffError, 'too deep|unsupported|invalid'):
-            self.load('[' * 100000 + ']' * 100000)
+        # Deep nesting never escapes as RecursionError. Some interpreters (CPython 3.14.6 here) parse it
+        # without a recursion limit; the schema check then refuses it.
+        try:
+            data = self.load('[' * 100000 + ']' * 100000)
+        except HandoffError as exc:
+            self.assertRegex(str(exc), 'too deep|unsupported|invalid')
+        else:
+            self.assertFalse(validate_handoff(data)['ok'])
+
+    def test_thc_r2_nul_in_path_is_reported_as_an_invalid_path(self):
+        with self.assertRaisesRegex(HandoffError, 'path is invalid'):
+            load_handoff(Path(self.tmp.name) / 'a\x00b.json')
 
 
 class Freshness(unittest.TestCase):
@@ -127,15 +137,20 @@ class CLIContract(unittest.TestCase):
 
 
 class DocumentedCoverage(unittest.TestCase):
-    def test_thc1_readme_matches_the_configured_ci_matrix(self):
+    OS_NAMES = {'ubuntu-latest': 'Linux', 'macos-latest': 'macOS', 'windows-latest': 'Windows'}
+
+    def test_thc1_readme_and_ci_matrix_agree_both_ways(self):
         workflow = (ROOT / '.github/workflows/tests.yml').read_text()
-        readme = (ROOT / 'README.md').read_text()
-        configured = sorted(set(re.findall(r"python: '([0-9.]+)'", workflow)))
+        readme = ' '.join((ROOT / 'README.md').read_text().split())
+        configured = {(self.OS_NAMES[os_], v) for os_, v in re.findall(r"- os: (\S+)\s+python: '([0-9.]+)'", workflow)}
         self.assertGreaterEqual(len(configured), 2)
-        claim = re.search(r'pull-request workflow is configured for (.+?macOS)\.', readme.replace('\n', ' ')).group(1)
-        for version in configured:
-            self.assertIn(version, claim)
-        self.assertIn('not executed by this change', readme.replace('\n', ' '))
+        claim = re.search(r'pull-request workflow is configured for (.+?(?:Linux|macOS|Windows))[.;]', readme).group(1)
+        claimed = set()
+        for part in claim.split(', plus '):
+            platform = re.search(r' on (\w+)$', part).group(1)
+            claimed |= {(platform, v) for v in re.findall(r'\d+\.\d+', part)}
+        self.assertEqual(claimed, configured)  # every claimed job exists, and every configured job is claimed
+        self.assertIn('not executed by this change', readme)
 
 
 if __name__ == '__main__':
