@@ -51,7 +51,7 @@ def load_handoff(path):
     fd = None
     try:
         if not stat.S_ISREG(path.lstat().st_mode):
-            raise HandoffError('handoff must be a regular file, not a symlink')
+            raise HandoffError('handoff must be a regular file (not a directory, symlink or device)')
         fd = os.open(path, os.O_RDONLY | getattr(os, 'O_NONBLOCK', 0) | getattr(os, 'O_NOFOLLOW', 0))
         if not stat.S_ISREG(os.fstat(fd).st_mode):
             raise HandoffError('handoff must be a regular file')
@@ -67,6 +67,8 @@ def load_handoff(path):
         raise
     except UnicodeDecodeError as exc:
         raise HandoffError('handoff must contain valid UTF-8 JSON') from exc
+    except UnicodeEncodeError as exc:  # only the path is ever encoded
+        raise HandoffError('handoff path is invalid (it cannot be encoded for this system)') from exc
     except json.JSONDecodeError as exc:
         raise HandoffError(f'invalid JSON at line {exc.lineno}, column {exc.colno}') from exc
     except RecursionError as exc:

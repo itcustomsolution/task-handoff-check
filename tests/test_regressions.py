@@ -188,6 +188,15 @@ class WrongPathTypes(unittest.TestCase):
                 with self.assertRaises(HandoffError):
                     load_handoff(bad)
 
+    # kofi r3 review: an empty path or a directory named a symlink, and an unencodable path named a JSON value.
+    def test_a_directory_or_unencodable_path_gets_an_accurate_message(self):
+        with tempfile.TemporaryDirectory() as d:
+            for bad in ('', d):
+                with self.subTest(bad=bad), self.assertRaisesRegex(HandoffError, 'regular file .*directory'):
+                    load_handoff(bad)
+        with self.assertRaisesRegex(HandoffError, 'path is invalid'):
+            load_handoff('handoff-\ud800.json')  # not encodable even with surrogateescape
+
 
 if __name__ == '__main__':
     unittest.main()
