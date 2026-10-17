@@ -163,7 +163,8 @@ report = validate_handoff(
 
 `validate_handoff` returns issues for invalid documents and raises `HandoffError`
 for invalid freshness options. The library accepts `max_age_hours` as a finite,
-nonnegative integer or float; integers of any size are compared exactly, and
+nonnegative integer or float; integers of any size are compared exactly, a float is compared exactly as the
+binary value it holds (so `0.1` is very slightly more than one tenth), and
 booleans and nonfinite values are rejected. `load_handoff` raises `HandoffError` for input errors, including
 numbers such as `1e999` that overflow Python's finite floating-point range.
 Validation does not mutate the document. Parser errors identify a location
