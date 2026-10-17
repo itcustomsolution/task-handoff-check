@@ -10,9 +10,6 @@ import unicodedata
 from urllib.parse import urlsplit
 
 MAX_HANDOFF_BYTES = 1024 * 1024
-# A deliberately broad cap covers the entire supported datetime calendar while
-# rejecting nonsensical option magnitudes before any int-to-float conversion.
-MAX_AGE_HOURS = 24 * 366 * 10000
 PLACEHOLDERS = {'tbd', 'todo', 'unknown', 'unassigned', 'n/a', 'none', '-', '?'}
 REQUIRED = {'schema_version', 'objective', 'owner', 'status', 'next_action',
             'inputs', 'evidence', 'blockers', 'completion_criteria'}
@@ -116,17 +113,19 @@ def _http_url(value):
 def validate_handoff(data, *, as_of=None, max_age_hours=None):
     """Return a JSON-compatible report. Optional freshness uses only supplied time.
 
-    ``as_of`` is a timestamp string. ``max_age_hours`` is an int or float in
-    the inclusive range 0..87,840,000 and requires ``as_of``. Booleans and
-    nonfinite floats are not accepted. Bad options raise HandoffError; invalid
-    document fields appear in the returned issues list.
+    ``as_of`` is a timestamp string. ``max_age_hours`` is a finite nonnegative
+    int or float and requires ``as_of``; booleans are not numbers here. Integers
+    of any size are compared exactly, never converted to float. Bad options
+    raise HandoffError; invalid document fields appear in the returned issues list.
     """
     clock = _timestamp(as_of) if as_of is not None else None
     if max_age_hours is not None:
+        # ponytail: no upper cap. The old OverflowError came from math.isfinite() on a huge int;
+        # Python compares int and float exactly, and any age beyond the timestamp range means "no limit".
         if (clock is None or type(max_age_hours) not in (int, float)
-                or not 0 <= max_age_hours <= MAX_AGE_HOURS
-                or (type(max_age_hours) is float and not math.isfinite(max_age_hours))):
-            raise HandoffError('max_age_hours requires as_of and a number from 0 to 87840000 hours')
+                or (type(max_age_hours) is float and not math.isfinite(max_age_hours))
+                or max_age_hours < 0):
+            raise HandoffError('max_age_hours requires as_of and a finite nonnegative number')
     issues = []
     freshness = 'not_evaluated'
 

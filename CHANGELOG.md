@@ -3,10 +3,10 @@
 ## Unreleased
 
 - Reject exponent-overflow JSON numbers, including positive and negative `1e999`, with `HandoffError`.
-- Bound freshness options to 0..87,840,000 hours without converting arbitrary-size integers to float; invalid options consistently raise `HandoffError`.
+- Freshness options no longer raise an undocumented `OverflowError`: integers of any size are compared exactly (never converted to float), and every invalid option raises `HandoffError`.
 - Report JSON parse locations without repeating input contents or filenames.
 - Restore the documented pull-request Python/platform matrix; distinguish configured jobs from executed verification.
-- Correct the published-release installation note; these changes remain local and unreleased.
+- Correct the installation note; it no longer describes the first release as future.
 - PyPI metadata (keywords, classifiers, homepage and changelog URLs), README pitch, badge placeholders and install-from-PyPI note.
 
 ## 0.1.0

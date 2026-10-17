@@ -30,9 +30,10 @@ The first two checks pass. The third exits 1 because it claims `complete` while
 listing an open blocker. All examples, people and references are fictional;
 referenced paths deliberately need not exist. The tool never opens them.
 
-The published 0.1.0 release is available with `pipx install task-handoff-check==0.1.0`
-(or `pip install task-handoff-check==0.1.0`). Use the source installation below
-for unreleased changes in this checkout.
+Install the latest published release with `pipx install task-handoff-check`
+(or `pip install task-handoff-check`). This README describes the source tree,
+which can contain unreleased changes; see [CHANGELOG.md](CHANGELOG.md) and use
+the source installation below to get them.
 
 To install from source in a virtual environment:
 
@@ -119,10 +120,8 @@ python -m task_handoff_check examples/in-progress.json \
 ```
 
 This example passes exactly at the 24-hour boundary. One second later it is
-`stale`. `--max-age-hours` must be finite, from 0 through 87,840,000 inclusive,
-and accompanied by `--as-of`. The broad upper bound covers the full supported
-timestamp calendar; it does not establish a meaningful freshness policy for you.
-Supplying `--as-of` requires a valid `updated_at` and rejects a future
+`stale`. `--max-age-hours` must be a finite, nonnegative number and accompanied
+by `--as-of`; choosing a meaningful freshness policy is up to you. Supplying `--as-of` requires a valid `updated_at` and rejects a future
 update. `--as-of` alone compares chronology, without a maximum-age policy.
 
 Accepted timestamps use `YYYY-MM-DDTHH:MM:SS`, optional 1–6 fractional digits,
@@ -163,9 +162,9 @@ report = validate_handoff(
 ```
 
 `validate_handoff` returns issues for invalid documents and raises `HandoffError`
-for invalid freshness options. The library accepts `max_age_hours` as an integer
-or float in the same inclusive range as the CLI; booleans and nonfinite values
-are rejected. `load_handoff` raises `HandoffError` for input errors, including
+for invalid freshness options. The library accepts `max_age_hours` as a finite,
+nonnegative integer or float; integers of any size are compared exactly, and
+booleans and nonfinite values are rejected. `load_handoff` raises `HandoffError` for input errors, including
 numbers such as `1e999` that overflow Python's finite floating-point range.
 Validation does not mutate the document. Parser errors identify a location
 without repeating JSON content or the input filename.
@@ -187,9 +186,9 @@ python -m unittest discover -s tests -v
 
 Tests use synthetic inputs and temporary directories. The pull-request workflow
 is configured for Python 3.10, 3.12 and 3.14 on Linux, plus Python 3.14 on macOS.
-Configuration describes intended coverage; inspect the workflow run results for
-executed coverage. Local unreleased-fix verification used Python 3.14 on macOS;
-the other configured jobs have not been run for these fixes.
+Configured jobs are not executed by this change; workflow run results are the
+evidence of executed coverage. This candidate was verified locally with CPython
+3.10, 3.11, 3.12 and 3.14 on macOS (arm64), from source and from the built wheel.
 See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Contributing

@@ -12,7 +12,7 @@ def main(argv=None):
     parser.add_argument('--json', action='store_true', help='print a machine-readable report')
     parser.add_argument('--as-of', help='explicit timestamp for comparison; no implicit current time')
     parser.add_argument('--max-age-hours', type=float,
-                        help='maximum age from 0 to 87840000 hours; requires --as-of')
+                        help='maximum age in hours (finite, nonnegative); requires --as-of')
     args = parser.parse_args(argv)
     options = {'as_of': args.as_of, 'max_age_hours': args.max_age_hours}
     try:
