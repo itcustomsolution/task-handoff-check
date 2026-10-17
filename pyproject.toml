@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "task-handoff-check"
-version = "0.1.1rc1"
+version = "0.1.1rc2"
 description = "Check structured task handoffs for missing and contradictory claims."
 readme = "README.md"
 requires-python = ">=3.10"
