@@ -14,7 +14,7 @@ are true, that its references exist, or that anyone is authorized to act.**
 
 An open-source engineering utility from [IT Custom Solution](https://github.com/itcustomsolution).
 Python 3.10+, no runtime dependencies, no network access, no commands executed.
-Version 0.1.0. MIT licensed.
+MIT licensed.
 
 ## Try it in one minute
 

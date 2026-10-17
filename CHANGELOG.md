@@ -9,6 +9,8 @@
 - Correct the installation note; it no longer describes the first release as future.
 - PyPI metadata (keywords, classifiers, homepage and changelog URLs), README pitch, badge placeholders and install-from-PyPI note.
 - A handoff path containing a NUL character raises `HandoffError('handoff path is invalid ...')` instead of a misleading JSON message.
+- Freshness compares the elapsed time in exact integer microseconds; a long interval just over the limit is now `stale` (independent re-audit RH-01).
+- The README no longer states a version number (it said 0.1.0 while the package is 0.1.1rc1; RH-02).
 - Local verification of the 0.1.1rc1 candidate (2026-10-16): CPython 3.10, 3.11, 3.12 and 3.14 on macOS (arm64), from source and from the built wheel. Python 3.13, Linux and Windows were not run; no hosted CI run exists for it.
 
 ## 0.1.0

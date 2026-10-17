@@ -1,5 +1,6 @@
 """Pure consistency validation; references are never opened or fetched."""
 from datetime import datetime
+from fractions import Fraction
 import json
 import math
 import os
@@ -244,13 +245,17 @@ def validate_handoff(data, *, as_of=None, max_age_hours=None):
             freshness = 'unavailable'
             issue('missing_timestamp', 'updated_at', 'a valid updated_at is required when as_of is supplied')
         else:
-            age_hours = (clock - updated).total_seconds() / 3600
+            # Exact integer microseconds: a float age loses precision over long intervals.
+            elapsed = clock - updated
+            elapsed_us = (elapsed.days * 86400 + elapsed.seconds) * 1_000_000 + elapsed.microseconds
             freshness = 'timestamp_compared'
-            if age_hours < 0:
+            if elapsed_us < 0:
                 freshness = 'future'
                 issue('future_timestamp', 'updated_at', 'updated_at is after the supplied as_of')
             elif max_age_hours is not None:
-                freshness = 'within_limit' if age_hours <= max_age_hours else 'stale'
+                # Fraction is exact for int and float limits alike.
+                limit_us = Fraction(max_age_hours) * 3_600_000_000
+                freshness = 'within_limit' if elapsed_us <= limit_us else 'stale'
                 if freshness == 'stale':
                     issue('stale', 'updated_at', 'updated_at exceeds the supplied maximum age')
     return result()

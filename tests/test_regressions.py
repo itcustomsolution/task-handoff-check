@@ -79,6 +79,17 @@ class Freshness(unittest.TestCase):
         self.assertEqual(validate_handoff(self.doc(), as_of=AS_OF, max_age_hours=23)['freshness'], 'stale')
         self.assertEqual(validate_handoff(self.doc(), as_of=AS_OF, max_age_hours=24)['freshness'], 'within_limit')
 
+    def test_rh01_long_intervals_are_compared_exactly(self):
+        data = self.doc('1000-01-01T00:00:00Z')
+        hours = 8993736  # exactly 1000-01-01 to 2026-01-01
+        self.assertEqual(validate_handoff(data, as_of='2026-01-01T00:00:00Z', max_age_hours=hours)['freshness'], 'within_limit')
+        report = validate_handoff(data, as_of='2026-01-01T00:00:00.000001Z', max_age_hours=hours)
+        self.assertEqual((report['ok'], report['freshness']), (False, 'stale'))
+        self.assertEqual(validate_handoff(data, as_of='2026-01-01T00:00:00.000001Z', max_age_hours=hours + 1)['freshness'], 'within_limit')
+        short = self.doc('2026-01-01T00:00:00Z')
+        self.assertEqual(validate_handoff(short, as_of='2026-01-01T00:30:00Z', max_age_hours=0.5)['freshness'], 'within_limit')
+        self.assertEqual(validate_handoff(short, as_of='2026-01-01T00:30:00.000001Z', max_age_hours=0.5)['freshness'], 'stale')
+
     def test_thc3_invalid_options_raise_only_the_documented_error(self):
         for value in (float('inf'), float('-inf'), float('nan'), -1, -10 ** 400, True, False, '24', None.__class__):
             with self.subTest(value=value), self.assertRaises(HandoffError):
@@ -107,6 +118,12 @@ class CLIContract(unittest.TestCase):
                 self.assertEqual(p.returncode, 2)
                 self.assertNotIn('Traceback', p.stderr)
         self.assertEqual(self.run_cli(handoff(), '--max-age-hours', '24').returncode, 2)  # missing --as-of
+
+    def test_rh01_cli_long_interval_one_microsecond_over_is_stale(self):
+        data = handoff()
+        data['updated_at'] = '1000-01-01T00:00:00Z'
+        p = self.run_cli(data, '--as-of', '2026-01-01T00:00:00.000001Z', '--max-age-hours', '8993736')
+        self.assertEqual(p.returncode, 1, p.stdout + p.stderr)
 
     def test_fabricated_but_consistent_handoff_passes_with_the_scope_disclaimer(self):
         data = handoff()
@@ -137,6 +154,12 @@ class CLIContract(unittest.TestCase):
 
 
 class DocumentedCoverage(unittest.TestCase):
+    def test_rh02_readme_states_no_version_other_than_the_package_version(self):
+        from task_handoff_check import __version__
+        readme = (ROOT / 'README.md').read_text()
+        for version in re.findall(r'\bVersion (\d+\.\d+\.\d+\S*?)[.\s]', readme):
+            self.assertEqual(version, __version__)
+
     OS_NAMES = {'ubuntu-latest': 'Linux', 'macos-latest': 'macOS', 'windows-latest': 'Windows'}
 
     def test_thc1_readme_and_ci_matrix_agree_both_ways(self):
