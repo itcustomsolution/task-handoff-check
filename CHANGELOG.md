@@ -1,7 +1,8 @@
 # Changelog
 
-## Unreleased (0.1.1rc2 candidate, 2026-10-17; not published; 0.1.1rc1 of 2026-10-16 was the independently audited candidate)
+## Unreleased (0.1.1rc3 candidate, 2026-10-17; not published; 0.1.1rc1 of 2026-10-16 and 0.1.1rc2 of 2026-10-17 were the independently audited candidates)
 
+- A handoff path that is not a string or path-like object (`None`, bytes, a number) raises `HandoffError` instead of `TypeError` (r2 audit observation).
 - Reject exponent-overflow JSON numbers, including positive and negative `1e999`, with `HandoffError`.
 - Freshness options no longer raise an undocumented `OverflowError`: integers of any size are compared exactly (never converted to float), and every invalid option raises `HandoffError`.
 - Report JSON parse locations without repeating input contents or filenames.
