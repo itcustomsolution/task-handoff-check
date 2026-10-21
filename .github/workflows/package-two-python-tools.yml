@@ -24,13 +24,13 @@ jobs:
           set -euo pipefail
           test "$GITHUB_RUN_ATTEMPT" = 1
           test "$GITHUB_REF" = refs/heads/codex/package-two-python-tools-20261021
-          printf '%s  %s\n' '0113309ae0098eefc1de484c36b9a4761398dc3704640e094c7060c992a623fa' 'release-packaging/bootstrap.py' | sha256sum --check --strict
-          printf '%s  %s\n' '64f80e761165e85d13e48a3bc391d53df995aebf3d3865dc159630baf5072203' 'release-packaging/MANIFEST.json' | sha256sum --check --strict
-          exec /usr/bin/python3 -I -S release-packaging/bootstrap.py 64f80e761165e85d13e48a3bc391d53df995aebf3d3865dc159630baf5072203
+          printf '%s  %s\n' '17589afd3cc9a57583102e085f1f1746f86a89f32c8677ecc2e40fbfff96962c' 'release-packaging/bootstrap.py' | sha256sum --check --strict
+          printf '%s  %s\n' '4a11586535af88fc763f2f682cd11ee57be2a55c91d04999a955941b05fcf911' 'release-packaging/MANIFEST.json' | sha256sum --check --strict
+          exec /usr/bin/python3 -I -S release-packaging/bootstrap.py 4a11586535af88fc763f2f682cd11ee57be2a55c91d04999a955941b05fcf911
       - name: Reconcile exact owned cleanup without restarting work
         if: always()
         shell: bash
         run: |
           set -euo pipefail
-          printf '%s  %s\n' '0113309ae0098eefc1de484c36b9a4761398dc3704640e094c7060c992a623fa' 'release-packaging/bootstrap.py' | sha256sum --check --strict
-          exec /usr/bin/python3 -I -S release-packaging/bootstrap.py cleanup 64f80e761165e85d13e48a3bc391d53df995aebf3d3865dc159630baf5072203
+          printf '%s  %s\n' '17589afd3cc9a57583102e085f1f1746f86a89f32c8677ecc2e40fbfff96962c' 'release-packaging/bootstrap.py' | sha256sum --check --strict
+          exec /usr/bin/python3 -I -S release-packaging/bootstrap.py cleanup 4a11586535af88fc763f2f682cd11ee57be2a55c91d04999a955941b05fcf911

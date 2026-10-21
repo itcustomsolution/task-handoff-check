@@ -74,10 +74,55 @@ def native(args,seconds=3,check=True):
  if check:assert result.returncode==0
  return result.returncode
 # Do not adopt a previously loaded unit, mount or staged operation.
+def probe_cap():resource.setrlimit(resource.RLIMIT_CPU,(1,1))
+def fresh(unit):
+ fields=('Id','LoadState','ActiveState','SubState','ControlGroup','FragmentPath','DropInPaths','Transient','Job')
+ args=['systemctl','show','--all',unit]
+ for field in fields:args.extend(['-p',field])
+ probe=subprocess.run(args,env=env,timeout=min(2,max(0.001,float(start)+600-time.monotonic())),capture_output=True,preexec_fn=probe_cap)
+ values={};reason=''
+ try:
+  assert len(probe.stdout)<=4096 and len(probe.stderr)<=4096,'probe-byte-limit'
+  for line in probe.stdout.decode('utf-8','strict').splitlines():
+   assert '=' in line,'probe-line'
+   key,value=line.split('=',1)
+   assert key in fields and key not in values,'probe-field'
+   values[key]=value
+  required=set(fields)-{'ControlGroup'}
+  assert required<=values.keys(),'probe-missing-fields'
+  assert values['Id']==unit,'unit-identity'
+  assert values['ActiveState']=='inactive' and values['SubState']=='dead','unit-not-dead'
+  assert values['FragmentPath']==values['DropInPaths']=='','configured-unit'
+  assert values['Transient']=='no' and values['Job'] in ('','0'),'transient-or-pending-unit'
+  assert values.get('ControlGroup','')=='','existing-control-group'
+  assert not (pathlib.Path('/sys/fs/cgroup')/parent).exists(),'existing-parent-cgroup'
+  if unit==parent and values['LoadState']=='loaded':
+   # Slice units are synthesized without a file; loaded is not active ownership.
+   assert probe.returncode==0 and 'ControlGroup' in values,'slice-probe-status'
+  else:
+   assert probe.returncode in (0,4) and values['LoadState']=='not-found','nonfresh-unit'
+ except (AssertionError,UnicodeError) as error:
+  reason=str(error)[:80] or type(error).__name__
+ if reason:
+  public={}
+  enums={'LoadState':('stub','loaded','not-found','bad-setting','error','merged','masked'),
+         'ActiveState':('active','reloading','inactive','failed','activating','deactivating','maintenance','refreshing'),
+         'SubState':('dead','active','running','waiting','failed'),'Transient':('yes','no')}
+  for key,value in values.items():
+   if key=='Id':public[key]={'matches':value==unit}
+   elif key in enums and value in enums[key]:public[key]=value
+   elif key=='Job' and value in ('','0'):public[key]='none'
+   else:public[key]={'empty':not value,'sha256':hashlib.sha256(value.encode()).hexdigest()}
+  record={'kind':'fresh-unit-refusal','unit':unit,'reason':reason,'returncode':probe.returncode,
+          'properties':public,
+          'stdout_bytes':len(probe.stdout),'stderr_bytes':len(probe.stderr),
+          'stdout_sha256':hashlib.sha256(probe.stdout).hexdigest(),'stderr_sha256':hashlib.sha256(probe.stderr).hexdigest()}
+  raw=json.dumps(record,sort_keys=True,separators=(',',':'))
+  if len(raw.encode())>1800-len('PACKAGING_ADMISSION_REFUSED ')-1:raw=json.dumps({'kind':'fresh-unit-refusal','unit':unit,'reason':reason,'returncode':probe.returncode,'detail_sha256':hashlib.sha256(raw.encode()).hexdigest()},sort_keys=True)
+  print('PACKAGING_ADMISSION_REFUSED '+raw,flush=True)
+  raise AssertionError('fresh-unit-admission')
 for unit in (parent,broker,stem+'ctl.service',stem+'work.service',stem+'expiry.timer',stem+'expiry.service'):
- def probe_cap():resource.setrlimit(resource.RLIMIT_CPU,(1,1))
- probe=subprocess.run(['systemctl','show',unit,'-p','LoadState','--value'],env=env,timeout=min(2,max(0.001,float(start)+600-time.monotonic())),capture_output=True,preexec_fn=probe_cap)
- assert len(probe.stdout)<=64 and probe.stdout.strip()==b'not-found'
+ fresh(unit)
 assert time.monotonic()-float(start)<15
 argv=['systemd-run','--quiet','--wait','--pipe','--service-type=exec','--unit='+broker,'--slice='+parent,
  '-p','MemoryMax=268435456','-p','MemorySwapMax=0','-p','TasksMax=8','-p','CPUQuota=10%',
