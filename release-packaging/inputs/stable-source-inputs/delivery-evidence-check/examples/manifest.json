@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "files": [
+    {
+      "path": "artifacts/review.txt",
+      "sha256": "41c8044b49434ee47032e107981ba6898e33ca801b77ecb143d6661382548903"
+    }
+  ],
+  "local_checks": [
+    {
+      "name": "Synthetic greeting review",
+      "result": "passed",
+      "evidence": [
+        "artifacts/review.txt"
+      ]
+    }
+  ]
+}

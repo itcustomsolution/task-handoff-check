@@ -1,0 +1,1 @@
+Synthetic review: the example greeting reads Hello, reader.

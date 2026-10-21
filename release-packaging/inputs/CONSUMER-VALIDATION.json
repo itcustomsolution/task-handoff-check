@@ -1,0 +1,44 @@
+{
+  "status": "DEFINITIONS_ONLY_UNRUN",
+  "cases": [
+    {
+      "id": "task-handoff-check-complete",
+      "exit": 0,
+      "ok": true,
+      "scope": "handoff_consistency"
+    },
+    {
+      "id": "task-handoff-check-invalid-complete",
+      "exit": 1,
+      "ok": false,
+      "scope": "handoff_consistency"
+    },
+    {
+      "id": "task-handoff-check-malformed",
+      "exit": 1,
+      "ok": false,
+      "scope": "handoff_consistency"
+    },
+    {
+      "id": "delivery-evidence-check-example",
+      "exit": 0,
+      "ok": true,
+      "scope": "local_file_integrity"
+    },
+    {
+      "id": "delivery-evidence-check-tampered",
+      "exit": 1,
+      "ok": false,
+      "scope": "local_file_integrity"
+    },
+    {
+      "id": "delivery-evidence-check-malformed",
+      "exit": 1,
+      "ok": false,
+      "scope": "local_file_integrity"
+    }
+  ],
+  "malformed_bytes": "{",
+  "fixtures": "Exact retained public examples and owned copies only",
+  "truth_limit": "Structural consistency/byte-integrity outputs do not establish authentic completion, authorized actions or truthful claims."
+}

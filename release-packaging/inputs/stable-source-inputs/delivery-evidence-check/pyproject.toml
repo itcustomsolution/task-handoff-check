@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=83.0.0"]  # CVE-2026-59890 (sdist MANIFEST exclusion bypass) fixed in 83.0.0
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "delivery-evidence-check"
+version = "0.2.0"
+description = "Check SHA-256 integrity of explicitly listed local evidence files."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{name = "IT Custom Solution LLC"}]
+keywords = ["sha256", "integrity", "evidence", "manifest", "ai-agents", "cli"]
+dependencies = []
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python :: 3",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3 :: Only",
+  "Topic :: Software Development :: Quality Assurance",
+]
+
+[project.scripts]
+delivery-evidence-check = "delivery_evidence_check.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/itcustomsolution/delivery-evidence-check"
+Changelog = "https://github.com/itcustomsolution/delivery-evidence-check/blob/main/CHANGELOG.md"
+Repository = "https://github.com/itcustomsolution/delivery-evidence-check"
+Issues = "https://github.com/itcustomsolution/delivery-evidence-check/issues"
+
+[tool.setuptools]
+packages = ["delivery_evidence_check"]

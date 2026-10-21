@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=83.0.0"]  # CVE-2026-59890 (sdist MANIFEST exclusion bypass) fixed in 83.0.0
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "task-handoff-check"
+version = "0.1.1"
+description = "Check structured task handoffs for missing and contradictory claims."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{name = "IT Custom Solution LLC"}]
+keywords = ["handoff", "ai-agents", "workflow", "validation", "cli", "json"]
+dependencies = []
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python :: 3",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3 :: Only",
+  "Topic :: Software Development :: Quality Assurance",
+]
+
+[project.scripts]
+task-handoff-check = "task_handoff_check.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/itcustomsolution/task-handoff-check"
+Changelog = "https://github.com/itcustomsolution/task-handoff-check/blob/main/CHANGELOG.md"
+Repository = "https://github.com/itcustomsolution/task-handoff-check"
+Issues = "https://github.com/itcustomsolution/task-handoff-check/issues"
+
+[tool.setuptools]
+packages = ["task_handoff_check"]

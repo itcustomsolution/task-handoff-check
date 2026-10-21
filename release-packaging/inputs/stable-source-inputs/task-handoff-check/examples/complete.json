@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "objective": "Review the sample release notes",
+  "owner": "Sample Maintainer",
+  "status": "complete",
+  "next_action": null,
+  "inputs": [
+    {
+      "label": "changelog",
+      "path": "docs/changelog.md"
+    }
+  ],
+  "evidence": [
+    {
+      "label": "review-notes",
+      "path": "reports/review.txt"
+    }
+  ],
+  "blockers": [],
+  "completion_criteria": [
+    {
+      "description": "All sample changes reviewed",
+      "met": true,
+      "evidence": [
+        "review-notes"
+      ]
+    }
+  ],
+  "updated_at": "2026-01-01T09:00:00Z"
+}

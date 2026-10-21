@@ -1,0 +1,520 @@
+{
+  "status": "SOURCE DEFINITIONS ONLY; NOT EXECUTED",
+  "commands": [
+    {
+      "id": "raw-python-preflight",
+      "argv": [
+        "/work/python/bin/python3.12",
+        "-I",
+        "-S",
+        "-c",
+        "import sys,sysconfig,pathlib,ssl,_ssl,ensurepip,json; assert sys.version_info[:3]==(3,12,15) and sys.prefix==sys.base_prefix=='/work/python'; assert sys.implementation.cache_tag=='cpython-312' and sys.abiflags=='' and sysconfig.get_config_var('SOABI')=='cpython-312-x86_64-linux-gnu'; assert all(pathlib.Path(p).resolve().is_relative_to(pathlib.Path('/work/python')) for p in sys.path); assert all(pathlib.Path(m.__file__).resolve().is_relative_to(pathlib.Path('/work/python')) for m in (ssl,_ssl,ensurepip,sysconfig,json,pathlib)); maps=pathlib.Path('/proc/self/maps').read_text(); assert '/work/python/lib/libpython3.12.so' in maps; print(json.dumps({'python':sys.version.split()[0],'soabi':sysconfig.get_config_var('SOABI'),'ensurepip':ensurepip.version(),'ssl':ssl.OPENSSL_VERSION,'stdlib':sysconfig.get_paths()['stdlib'],'libpython':'/work/python/lib/libpython3.12.so'},sort_keys=True))"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 3,
+      "phase": "toolchain-admission",
+      "expect": "exit0; owned stdlib/import/sys.path/libpython, version and ABI assertions before venv/pip bootstrap",
+      "cwd": "/work/empty"
+    },
+    {
+      "id": "builder-environment",
+      "argv": [
+        "/work/python/bin/python3.12",
+        "-I",
+        "-m",
+        "venv",
+        "/work/builder"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 10,
+      "phase": "toolchain-admission",
+      "expect": "exit0",
+      "cwd": "/work/empty"
+    },
+    {
+      "id": "build-tools-local-only",
+      "argv": [
+        "/work/builder/bin/python",
+        "-I",
+        "-m",
+        "pip",
+        "install",
+        "--no-index",
+        "--no-deps",
+        "--no-compile",
+        "--require-hashes",
+        "-r",
+        "/inputs/build-wheels.lock"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 15,
+      "phase": "toolchain-admission",
+      "expect": "exit0",
+      "cwd": "/work/empty"
+    },
+    {
+      "id": "task-handoff-check-copy",
+      "argv": [
+        "/bin/cp",
+        "-R",
+        "--",
+        "/inputs/stable-source-inputs/task-handoff-check",
+        "/work/src/task-handoff-check"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 2,
+      "phase": "offline",
+      "expect": "exit0",
+      "cwd": "/work/empty"
+    },
+    {
+      "id": "task-handoff-check-sdist",
+      "argv": [
+        "/work/builder/bin/python",
+        "-I",
+        "-m",
+        "build",
+        "--no-isolation",
+        "--sdist",
+        "--outdir",
+        "/work/dist/task-handoff-check",
+        "/work/src/task-handoff-check"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 40,
+      "phase": "offline",
+      "expect": "exit0",
+      "cwd": "/work/empty"
+    },
+    {
+      "id": "task-handoff-check-validate-extract-sdist",
+      "argv": [
+        "/usr/bin/python3",
+        "-I",
+        "-S",
+        "/control/payload.py",
+        "extract-sdist",
+        "/inputs/STABLE-SOURCE-INPUT-MANIFEST.json",
+        "task-handoff-check",
+        "/work/dist/task-handoff-check/task_handoff_check-0.1.1.tar.gz",
+        "/work/sdist/task-handoff-check"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 10,
+      "phase": "offline",
+      "expect": "exact allowed source members, ordinary files/directories only, no links/traversal/duplicates; max16MiB expanded, max128members; all prepared source pins agree; new output directory",
+      "cwd": "/work/empty"
+    },
+    {
+      "id": "task-handoff-check-wheel-from-sdist",
+      "argv": [
+        "/work/builder/bin/python",
+        "-I",
+        "-m",
+        "build",
+        "--no-isolation",
+        "--wheel",
+        "--outdir",
+        "/work/dist/task-handoff-check",
+        "/work/sdist/task-handoff-check/task_handoff_check-0.1.1"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 40,
+      "phase": "offline",
+      "expect": "exit0",
+      "cwd": "/work/empty"
+    },
+    {
+      "id": "delivery-evidence-check-copy",
+      "argv": [
+        "/bin/cp",
+        "-R",
+        "--",
+        "/inputs/stable-source-inputs/delivery-evidence-check",
+        "/work/src/delivery-evidence-check"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 2,
+      "phase": "offline",
+      "expect": "exit0",
+      "cwd": "/work/empty"
+    },
+    {
+      "id": "delivery-evidence-check-sdist",
+      "argv": [
+        "/work/builder/bin/python",
+        "-I",
+        "-m",
+        "build",
+        "--no-isolation",
+        "--sdist",
+        "--outdir",
+        "/work/dist/delivery-evidence-check",
+        "/work/src/delivery-evidence-check"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 40,
+      "phase": "offline",
+      "expect": "exit0",
+      "cwd": "/work/empty"
+    },
+    {
+      "id": "delivery-evidence-check-validate-extract-sdist",
+      "argv": [
+        "/usr/bin/python3",
+        "-I",
+        "-S",
+        "/control/payload.py",
+        "extract-sdist",
+        "/inputs/STABLE-SOURCE-INPUT-MANIFEST.json",
+        "delivery-evidence-check",
+        "/work/dist/delivery-evidence-check/delivery_evidence_check-0.2.0.tar.gz",
+        "/work/sdist/delivery-evidence-check"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 10,
+      "phase": "offline",
+      "expect": "exact allowed source members, ordinary files/directories only, no links/traversal/duplicates; max16MiB expanded, max128members; all prepared source pins agree; new output directory",
+      "cwd": "/work/empty"
+    },
+    {
+      "id": "delivery-evidence-check-wheel-from-sdist",
+      "argv": [
+        "/work/builder/bin/python",
+        "-I",
+        "-m",
+        "build",
+        "--no-isolation",
+        "--wheel",
+        "--outdir",
+        "/work/dist/delivery-evidence-check",
+        "/work/sdist/delivery-evidence-check/delivery_evidence_check-0.2.0"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 40,
+      "phase": "offline",
+      "expect": "exit0",
+      "cwd": "/work/empty"
+    },
+    {
+      "id": "final-artifact-binding",
+      "argv": [
+        "/work/builder/bin/python",
+        "-I",
+        "/control/validate_stable_archives.py",
+        "/inputs/STABLE-SOURCE-INPUT-MANIFEST.json",
+        "/inputs/stable-source-inputs",
+        "/work/dist",
+        "/inputs/rc-archives",
+        "/work/receipts/artifact-binding.json"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 15,
+      "phase": "offline",
+      "expect": "exit0",
+      "cwd": "/work/empty"
+    },
+    {
+      "id": "prepare-owned-consumer-fixtures",
+      "argv": [
+        "/usr/bin/python3",
+        "-I",
+        "-S",
+        "/control/payload.py",
+        "fixtures",
+        "/inputs/stable-source-inputs",
+        "/work/fixtures"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 5,
+      "phase": "offline",
+      "expect": "copy only retained public examples; create literal malformed JSON fixture; no owner/source writes",
+      "cwd": "/work/empty"
+    },
+    {
+      "id": "task-handoff-check-consumer-env",
+      "argv": [
+        "/work/python/bin/python3.12",
+        "-I",
+        "-m",
+        "venv",
+        "/work/consumers/task-handoff-check"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 10,
+      "phase": "offline",
+      "expect": "exit0",
+      "cwd": "/work/empty"
+    },
+    {
+      "id": "task-handoff-check-consumer-install",
+      "argv": [
+        "/work/consumers/task-handoff-check/bin/python",
+        "-I",
+        "-m",
+        "pip",
+        "install",
+        "--no-index",
+        "--no-deps",
+        "--no-compile",
+        "--disable-pip-version-check",
+        "/work/dist/task-handoff-check/task_handoff_check-0.1.1-py3-none-any.whl"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 5,
+      "phase": "offline",
+      "expect": "exit0",
+      "cwd": "/work/empty"
+    },
+    {
+      "id": "task-handoff-check-version",
+      "argv": [
+        "/work/consumers/task-handoff-check/bin/task-handoff-check",
+        "--version"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 2,
+      "phase": "offline",
+      "expect": "exit0, stdout exactly 0.1.1 plus newline",
+      "cwd": "/work/empty"
+    },
+    {
+      "id": "task-handoff-check-help",
+      "argv": [
+        "/work/consumers/task-handoff-check/bin/task-handoff-check",
+        "--help"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 2,
+      "phase": "offline",
+      "expect": "exit0",
+      "cwd": "/work/empty"
+    },
+    {
+      "id": "task-handoff-check-dependencies",
+      "argv": [
+        "/work/consumers/task-handoff-check/bin/python",
+        "-I",
+        "-m",
+        "pip",
+        "check"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 2,
+      "phase": "offline",
+      "expect": "exit0",
+      "cwd": "/work/empty"
+    },
+    {
+      "id": "task-handoff-check-identity",
+      "argv": [
+        "/work/consumers/task-handoff-check/bin/python",
+        "-I",
+        "-c",
+        "import pathlib,importlib.metadata as m; import task_handoff_check as p; assert p.__version__ == m.version('task-handoff-check') == '0.1.1'; assert pathlib.Path(p.__file__).resolve().is_relative_to(pathlib.Path('/work/consumers/task-handoff-check').resolve()); print(p.__version__,p.__file__)"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 2,
+      "phase": "offline",
+      "expect": "exit0",
+      "cwd": "/work/empty"
+    },
+    {
+      "id": "task-handoff-check-complete",
+      "argv": [
+        "/work/consumers/task-handoff-check/bin/task-handoff-check",
+        "/work/fixtures/task-handoff-check/complete.json",
+        "--json"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 5,
+      "phase": "offline",
+      "expect": "exit0, valid JSON ok=true, scope=handoff_consistency",
+      "cwd": "/work/empty"
+    },
+    {
+      "id": "task-handoff-check-invalid-complete",
+      "argv": [
+        "/work/consumers/task-handoff-check/bin/task-handoff-check",
+        "/work/fixtures/task-handoff-check/invalid-complete.json",
+        "--json"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 5,
+      "phase": "offline",
+      "expect": "exit1, valid JSON ok=false, scope=handoff_consistency",
+      "cwd": "/work/empty"
+    },
+    {
+      "id": "task-handoff-check-malformed",
+      "argv": [
+        "/work/consumers/task-handoff-check/bin/task-handoff-check",
+        "/work/fixtures/malformed.json",
+        "--json"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 5,
+      "phase": "offline",
+      "expect": "exit1, valid JSON ok=false, scope=handoff_consistency",
+      "cwd": "/work/empty"
+    },
+    {
+      "id": "delivery-evidence-check-consumer-env",
+      "argv": [
+        "/work/python/bin/python3.12",
+        "-I",
+        "-m",
+        "venv",
+        "/work/consumers/delivery-evidence-check"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 10,
+      "phase": "offline",
+      "expect": "exit0",
+      "cwd": "/work/empty"
+    },
+    {
+      "id": "delivery-evidence-check-consumer-install",
+      "argv": [
+        "/work/consumers/delivery-evidence-check/bin/python",
+        "-I",
+        "-m",
+        "pip",
+        "install",
+        "--no-index",
+        "--no-deps",
+        "--no-compile",
+        "--disable-pip-version-check",
+        "/work/dist/delivery-evidence-check/delivery_evidence_check-0.2.0-py3-none-any.whl"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 5,
+      "phase": "offline",
+      "expect": "exit0",
+      "cwd": "/work/empty"
+    },
+    {
+      "id": "delivery-evidence-check-version",
+      "argv": [
+        "/work/consumers/delivery-evidence-check/bin/delivery-evidence-check",
+        "--version"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 2,
+      "phase": "offline",
+      "expect": "exit0, stdout exactly 0.2.0 plus newline",
+      "cwd": "/work/empty"
+    },
+    {
+      "id": "delivery-evidence-check-help",
+      "argv": [
+        "/work/consumers/delivery-evidence-check/bin/delivery-evidence-check",
+        "--help"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 2,
+      "phase": "offline",
+      "expect": "exit0",
+      "cwd": "/work/empty"
+    },
+    {
+      "id": "delivery-evidence-check-dependencies",
+      "argv": [
+        "/work/consumers/delivery-evidence-check/bin/python",
+        "-I",
+        "-m",
+        "pip",
+        "check"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 2,
+      "phase": "offline",
+      "expect": "exit0",
+      "cwd": "/work/empty"
+    },
+    {
+      "id": "delivery-evidence-check-identity",
+      "argv": [
+        "/work/consumers/delivery-evidence-check/bin/python",
+        "-I",
+        "-c",
+        "import pathlib,importlib.metadata as m; import delivery_evidence_check as p; assert p.__version__ == m.version('delivery-evidence-check') == '0.2.0'; assert pathlib.Path(p.__file__).resolve().is_relative_to(pathlib.Path('/work/consumers/delivery-evidence-check').resolve()); print(p.__version__,p.__file__)"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 2,
+      "phase": "offline",
+      "expect": "exit0",
+      "cwd": "/work/empty"
+    },
+    {
+      "id": "delivery-evidence-check-example",
+      "argv": [
+        "/work/consumers/delivery-evidence-check/bin/delivery-evidence-check",
+        "verify",
+        "/work/fixtures/delivery-evidence-check/manifest.json",
+        "--root",
+        "/work/fixtures/delivery-evidence-check",
+        "--json"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 5,
+      "phase": "offline",
+      "expect": "exit0, valid JSON ok=true, scope=local_file_integrity",
+      "cwd": "/work/empty"
+    },
+    {
+      "id": "delivery-evidence-check-tampered",
+      "argv": [
+        "/work/consumers/delivery-evidence-check/bin/delivery-evidence-check",
+        "verify",
+        "/work/fixtures/delivery-evidence-check/manifest.json",
+        "--root",
+        "/work/fixtures/delivery-evidence-check",
+        "--json"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 5,
+      "phase": "offline",
+      "expect": "exit1, valid JSON ok=false, scope=local_file_integrity; before this call only append literal ASCII tamper to the owned fixtures/artifacts/review.txt; original source example and manifest untouched",
+      "cwd": "/work/empty"
+    },
+    {
+      "id": "delivery-evidence-check-malformed",
+      "argv": [
+        "/work/consumers/delivery-evidence-check/bin/delivery-evidence-check",
+        "verify",
+        "/work/fixtures/malformed.json",
+        "--root",
+        "/work/fixtures/delivery-evidence-check",
+        "--json"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 5,
+      "phase": "offline",
+      "expect": "exit1, valid JSON ok=false, scope=local_file_integrity",
+      "cwd": "/work/empty"
+    },
+    {
+      "id": "fresh-readonly-artifact-recheck",
+      "argv": [
+        "/work/builder/bin/python",
+        "-I",
+        "/control/validate_stable_archives.py",
+        "/inputs/STABLE-SOURCE-INPUT-MANIFEST.json",
+        "/inputs/stable-source-inputs",
+        "/work/dist",
+        "/inputs/rc-archives",
+        "/work/receipts/final-binding.json"
+      ],
+      "max_invocations": 1,
+      "wall_seconds": 15,
+      "phase": "final",
+      "expect": "exit0",
+      "cwd": "/work/empty"
+    }
+  ],
+  "toolchain_admission_wall_sum": 30,
+  "offline_command_wall_sum": 295,
+  "stop_rule": "Unexpected exit/status/output, timeout, cap or input drift stops entire job; expected negative-case exit1 is a successful check, not a retry. No extra suite/build/reviewer/repair invocation.",
+  "scripts": "32 manifest commands plus one2-second post-install identity admission. Setup28s plus identity2s within acquisition180s; offline280s plus final data-only readonly archive recheck15s fit the same300s offline window. Four builds, six CLI behavior cases, no extra suite or retry."
+}

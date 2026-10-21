@@ -1,0 +1,56 @@
+{
+  "assets": [
+    {
+      "role": "CPython toolchain, upstream Actions build for Ubuntu24.04 amd64",
+      "filename": "python-3.12.15-linux-24.04-x64.tar.gz",
+      "url": "https://github.com/actions/python-versions/releases/download/3.12.15-36805895057/python-3.12.15-linux-24.04-x64.tar.gz",
+      "bytes": 95218570,
+      "sha256": "fcb672b0437c2d8df5565b7cc250b2b0d7455e2b8d6a4a107cfa6f2efe4f7ed8",
+      "max_downloads": 1
+    },
+    {
+      "role": "build",
+      "filename": "build-1.6.1-py3-none-any.whl",
+      "size": 31179,
+      "sha256": "ecd351a4be9d35a9eaaba244a7687143c9c7d4aea6ac964e7e7ddab20cbcf4e7",
+      "url": "https://files.pythonhosted.org/packages/ad/9b/9fb3585dabcd73a1b2a6267f63f62649347c9e6d072c9fde365b105abb2c/build-1.6.1-py3-none-any.whl",
+      "bytes": 31179,
+      "max_downloads": 1
+    },
+    {
+      "role": "setuptools",
+      "filename": "setuptools-84.0.0-py3-none-any.whl",
+      "size": 818216,
+      "sha256": "51a52592b3b99e102b609654876bd65f19f999935166d1352678931132b0c670",
+      "url": "https://files.pythonhosted.org/packages/95/9c/c510029fc6ef33a6275cd2c5d3cecd6613dfd6aa401d57c54f1c18852ccf/setuptools-84.0.0-py3-none-any.whl",
+      "bytes": 818216,
+      "max_downloads": 1
+    },
+    {
+      "role": "packaging",
+      "filename": "packaging-26.3-py3-none-any.whl",
+      "size": 129956,
+      "sha256": "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c",
+      "url": "https://files.pythonhosted.org/packages/63/34/ba1c580383c9eada3711951fef0795c80b829a078d72188184bcab9dd527/packaging-26.3-py3-none-any.whl",
+      "bytes": 129956,
+      "max_downloads": 1
+    },
+    {
+      "role": "pyproject-hooks",
+      "filename": "pyproject_hooks-1.3.3-py3-none-any.whl",
+      "size": 10724,
+      "sha256": "5fc53fdac9f7bd63fbcdc868fb5f90b4784d78a53a3d3388cd738b807441a20b",
+      "url": "https://files.pythonhosted.org/packages/85/11/044d1ae1b4ec0d7af88ee5bc91e081be1022533032b906a7bdabdbb60977/pyproject_hooks-1.3.3-py3-none-any.whl",
+      "bytes": 10724,
+      "max_downloads": 1
+    }
+  ],
+  "exact_entity_bytes": 96208645,
+  "response_body_cap_bytes": 134217728,
+  "allowed_hosts": [
+    "github.com",
+    "release-assets.githubusercontent.com",
+    "files.pythonhosted.org"
+  ],
+  "redirect_policy": "HTTPS only; only exact listed GitHub asset redirect to release-assets.githubusercontent.com, no userinfo, no auth header or cookies; PyPI wheel URLs no redirect outside files.pythonhosted.org. One attempt per asset, no fallback/index/cache substitution. Cap response bytes before writing, exact length+SHA256 before extraction or execution. TLS/DNS framing is not represented as measured content bytes."
+}
