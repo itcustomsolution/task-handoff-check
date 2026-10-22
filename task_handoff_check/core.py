@@ -1,5 +1,6 @@
 """Pure consistency validation; references are never opened or fetched."""
 from datetime import datetime
+from fractions import Fraction
 import json
 import math
 import os
@@ -32,13 +33,25 @@ def _constant(value):
     raise HandoffError('nonfinite JSON numbers are not supported')
 
 
+def _finite_float(value):
+    number = float(value)
+    if not math.isfinite(number):
+        raise HandoffError('nonfinite JSON numbers are not supported')
+    return number
+
+
 def load_handoff(path):
     """Read one regular UTF-8 JSON file, up to 1 MiB. Reject final symlinks."""
-    path = Path(path)
+    try:
+        path = Path(path)
+    except TypeError as exc:  # None, bytes, a number: a documented error, not a TypeError
+        raise HandoffError('handoff path must be a string or path-like object') from exc
+    if '\x00' in str(path):
+        raise HandoffError('handoff path is invalid (contains a NUL character)')
     fd = None
     try:
         if not stat.S_ISREG(path.lstat().st_mode):
-            raise HandoffError('handoff must be a regular file, not a symlink')
+            raise HandoffError('handoff must be a regular file (not a directory, symlink or device)')
         fd = os.open(path, os.O_RDONLY | getattr(os, 'O_NONBLOCK', 0) | getattr(os, 'O_NOFOLLOW', 0))
         if not stat.S_ISREG(os.fstat(fd).st_mode):
             raise HandoffError('handoff must be a regular file')
@@ -48,9 +61,22 @@ def load_handoff(path):
             contents = stream.read(MAX_HANDOFF_BYTES + 1)
         if len(contents) > MAX_HANDOFF_BYTES:
             raise HandoffError('handoff exceeds 1 MiB')
-        return json.loads(contents.decode('utf-8'), object_pairs_hook=_object, parse_constant=_constant)
-    except (OSError, ValueError, UnicodeError, RecursionError) as exc:
-        raise HandoffError('cannot read handoff JSON: ' + str(exc)) from exc
+        return json.loads(contents.decode('utf-8'), object_pairs_hook=_object,
+                          parse_constant=_constant, parse_float=_finite_float)
+    except HandoffError:
+        raise
+    except UnicodeDecodeError as exc:
+        raise HandoffError('handoff must contain valid UTF-8 JSON') from exc
+    except UnicodeEncodeError as exc:  # only the path is ever encoded
+        raise HandoffError('handoff path is invalid (it cannot be encoded for this system)') from exc
+    except json.JSONDecodeError as exc:
+        raise HandoffError(f'invalid JSON at line {exc.lineno}, column {exc.colno}') from exc
+    except RecursionError as exc:
+        raise HandoffError('handoff JSON nesting is too deep') from exc
+    except OSError as exc:
+        raise HandoffError('cannot read handoff JSON: ' + (exc.strerror or 'file unavailable')) from exc
+    except ValueError as exc:
+        raise HandoffError('handoff contains an unsupported JSON value') from exc
     finally:
         if fd is not None:
             os.close(fd)
@@ -96,13 +122,17 @@ def validate_handoff(data, *, as_of=None, max_age_hours=None):
     """Return a JSON-compatible report. Optional freshness uses only supplied time.
 
     ``as_of`` is a timestamp string. ``max_age_hours`` is a finite nonnegative
-    number and requires ``as_of``. Bad options raise HandoffError; invalid
-    document fields appear in the returned issues list.
+    int or float and requires ``as_of``; booleans are not numbers here. Integers
+    of any size are compared exactly, never converted to float. Bad options
+    raise HandoffError; invalid document fields appear in the returned issues list.
     """
     clock = _timestamp(as_of) if as_of is not None else None
     if max_age_hours is not None:
+        # ponytail: no upper cap. The old OverflowError came from math.isfinite() on a huge int;
+        # Python compares int and float exactly, and any age beyond the timestamp range means "no limit".
         if (clock is None or type(max_age_hours) not in (int, float)
-                or not math.isfinite(max_age_hours) or max_age_hours < 0):
+                or (type(max_age_hours) is float and not math.isfinite(max_age_hours))
+                or max_age_hours < 0):
             raise HandoffError('max_age_hours requires as_of and a finite nonnegative number')
     issues = []
     freshness = 'not_evaluated'
@@ -220,13 +250,17 @@ def validate_handoff(data, *, as_of=None, max_age_hours=None):
             freshness = 'unavailable'
             issue('missing_timestamp', 'updated_at', 'a valid updated_at is required when as_of is supplied')
         else:
-            age_hours = (clock - updated).total_seconds() / 3600
+            # Exact integer microseconds: a float age loses precision over long intervals.
+            elapsed = clock - updated
+            elapsed_us = (elapsed.days * 86400 + elapsed.seconds) * 1_000_000 + elapsed.microseconds
             freshness = 'timestamp_compared'
-            if age_hours < 0:
+            if elapsed_us < 0:
                 freshness = 'future'
                 issue('future_timestamp', 'updated_at', 'updated_at is after the supplied as_of')
             elif max_age_hours is not None:
-                freshness = 'within_limit' if age_hours <= max_age_hours else 'stale'
+                # Fraction is exact for int and float limits alike.
+                limit_us = Fraction(max_age_hours) * 3_600_000_000
+                freshness = 'within_limit' if elapsed_us <= limit_us else 'stale'
                 if freshness == 'stale':
                     issue('stale', 'updated_at', 'updated_at exceeds the supplied maximum age')
     return result()
