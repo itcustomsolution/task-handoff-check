@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased (0.1.1rc3 candidate, 2026-10-17; not published; 0.1.1rc1 of 2026-10-16 and 0.1.1rc2 of 2026-10-17 were the independently audited candidates)
+## 0.1.1 (2026-10-22)
 
 - A handoff path that is not a string or path-like object (`None`, bytes, a number) raises `HandoffError` instead of `TypeError` (r2 audit observation).
 - Reject exponent-overflow JSON numbers, including positive and negative `1e999`, with `HandoffError`.
