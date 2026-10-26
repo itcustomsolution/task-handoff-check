@@ -2,8 +2,6 @@
 
 > Lint a task handoff (human or AI agent) for a missing owner, next step, blockers, done criteria or evidence before someone else picks it up.
 
-<!-- [![tests](https://github.com/itcustomsolution/task-handoff-check/actions/workflows/tests.yml/badge.svg)](https://github.com/itcustomsolution/task-handoff-check/actions/workflows/tests.yml) -->
-[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 Catch incomplete or contradictory task handoffs before someone else picks up
 the work. This small CLI and library checks an explicit JSON document for a
@@ -15,6 +13,21 @@ are true, that its references exist, or that anyone is authorized to act.**
 An open-source engineering utility from [IT Custom Solution](https://github.com/itcustomsolution).
 Python 3.10+, no runtime dependencies, no network access, no commands executed.
 MIT licensed.
+
+## Release and verification
+
+As of **26 October 2026**, [0.1.1 on PyPI](https://pypi.org/project/task-handoff-check/0.1.1/) is the published package, with [GitHub release v0.1.1](https://github.com/itcustomsolution/task-handoff-check/releases/tag/v0.1.1) and an [MIT license](LICENSE). This README follows the source tree; development changes may precede a package release.
+
+The [release-preparation test run](https://github.com/itcustomsolution/task-handoff-check/actions/runs/39721393964) passed. That link records its own revision and jobs; it is not a claim that every later commit or platform has been tested. Run the [local checks](#limits-and-development) for your checkout.
+
+For a repeatable package install in an activated virtual environment:
+
+```sh
+python -m pip install 'task-handoff-check==0.1.1'
+task-handoff-check --version
+```
+
+The [two-tool walkthrough](https://github.com/itcustomsolution/.github/blob/main/docs/public-tools-walkthrough.md) shows a consistent handoff, a valid manifest and deliberate failure cases using fictional data.
 
 ## Try it in one minute
 
