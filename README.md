@@ -203,6 +203,12 @@ is configured for Python 3.10, 3.12 and 3.14 on Linux, plus Python 3.14 on macOS
 Configured jobs are not executed by this change; workflow run results are the
 evidence of executed coverage. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
+## Using a handoff in a workflow
+
+Use a passing report to start the next person's review: they still need to inspect the evidence, confirm authority and accept the work against agreed criteria. This utility does not connect your task systems or establish that a live handoff process works end to end.
+
+For help mapping one IT workflow's owners, exceptions and evidence gaps, see ITC's [IT Operations Workflow Review](https://itcustomsolution.com/practices/consulting). The outcome is a practical improvement brief, with optional AI readiness where relevant. Implementation and ongoing operation are separately scoped.
+
 ## Contributing
 
 Issues and small pull requests are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md). Run `python -m unittest discover -s tests` before opening a PR. Release history is in [CHANGELOG.md](CHANGELOG.md).
