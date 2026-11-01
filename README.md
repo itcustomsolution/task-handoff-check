@@ -16,14 +16,14 @@ MIT licensed.
 
 ## Release and verification
 
-As of **26 October 2026**, [0.1.1 on PyPI](https://pypi.org/project/task-handoff-check/0.1.1/) is the published package, with [GitHub release v0.1.1](https://github.com/itcustomsolution/task-handoff-check/releases/tag/v0.1.1) and an [MIT license](LICENSE). This README follows the source tree; development changes may precede a package release.
+Published packages are on [PyPI](https://pypi.org/project/task-handoff-check/), and release notes are on [GitHub](https://github.com/itcustomsolution/task-handoff-check/releases). The source tree may contain unreleased changes. The tool is [MIT licensed](https://github.com/itcustomsolution/task-handoff-check/blob/main/LICENSE).
 
 The [release-preparation test run](https://github.com/itcustomsolution/task-handoff-check/actions/runs/39721393964) passed. That link records its own revision and jobs; it is not a claim that every later commit or platform has been tested. Run the [local checks](#limits-and-development) for your checkout.
 
-For a repeatable package install in an activated virtual environment:
+Install the latest published package in an activated virtual environment:
 
 ```sh
-python -m pip install 'task-handoff-check==0.1.1'
+python -m pip install --upgrade task-handoff-check
 task-handoff-check --version
 ```
 
@@ -45,7 +45,7 @@ referenced paths deliberately need not exist. The tool never opens them.
 
 Install the latest published release with `pipx install task-handoff-check`
 (or `pip install task-handoff-check`). This README describes the source tree,
-which can contain unreleased changes; see [CHANGELOG.md](CHANGELOG.md) and use
+which can contain unreleased changes; see [CHANGELOG.md](https://github.com/itcustomsolution/task-handoff-check/blob/main/CHANGELOG.md) and use
 the source installation below to get them.
 
 To install from source in a virtual environment:
@@ -192,7 +192,7 @@ trusted local input locations; the input reader is not a filesystem sandbox.
 
 The tool performs no authentication, authorization, link checking, ownership
 verification, work execution, scheduling, agent dispatch or compliance assessment.
-It never changes a task's state. See [SECURITY.md](SECURITY.md).
+It never changes a task's state. See [SECURITY.md](https://github.com/itcustomsolution/task-handoff-check/blob/main/SECURITY.md).
 
 ```sh
 python -m unittest discover -s tests -v
@@ -201,7 +201,7 @@ python -m unittest discover -s tests -v
 Tests use synthetic inputs and temporary directories. The pull-request workflow
 is configured for Python 3.10, 3.12 and 3.14 on Linux, plus Python 3.14 on macOS.
 Configured jobs are not executed by this change; workflow run results are the
-evidence of executed coverage. See [CONTRIBUTING.md](CONTRIBUTING.md).
+evidence of executed coverage. See [CONTRIBUTING.md](https://github.com/itcustomsolution/task-handoff-check/blob/main/CONTRIBUTING.md).
 
 ## Using a handoff in a workflow
 
@@ -213,8 +213,8 @@ The review covers one workflow: process map, exceptions, evidence gaps, ownershi
 
 ## Contributing
 
-Issues and small pull requests are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md). Run `python -m unittest discover -s tests` before opening a PR. Release history is in [CHANGELOG.md](CHANGELOG.md).
+Issues and small pull requests are welcome; see [CONTRIBUTING.md](https://github.com/itcustomsolution/task-handoff-check/blob/main/CONTRIBUTING.md). Run `python -m unittest discover -s tests` before opening a PR. Release history is in [CHANGELOG.md](https://github.com/itcustomsolution/task-handoff-check/blob/main/CHANGELOG.md).
 
 ## License
 
-MIT, see [LICENSE](LICENSE).
+MIT, see [LICENSE](https://github.com/itcustomsolution/task-handoff-check/blob/main/LICENSE).
