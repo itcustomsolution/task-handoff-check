@@ -70,7 +70,8 @@ def check_description(description, name, version, root):
             if not target.is_relative_to(root.resolve()) or not target.is_file():
                 raise ValueError(f"missing repository documentation: {link}")
         remote.add(link)
-    pins = re.findall(rf"\b{re.escape(name)}(?:\[[^\]]+\])?==([^\s'\";]+)", "".join(page.code))
+    distribution = r"[-_.]+".join(re.escape(part) for part in re.split(r"[-_.]+", name))
+    pins = re.findall(rf"\b{distribution}(?:\s*\[[^\]]+\])?\s*==\s*([^\s'\";]+)", "".join(page.code), re.IGNORECASE)
     if any(pin != version for pin in pins):
         raise ValueError(f"stale installation pin: {pins}; wheel version is {version}")
     return rendered, remote

@@ -39,6 +39,12 @@ class PackagePageTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "stale installation pin"):
             self.check('```sh\npython -m pip install "example-tool[pdf]==1.2.2"\n```')
 
+    def test_equivalent_requirement_names_and_spacing_are_checked(self):
+        for requirement in ["example_tool==1.2.2", "EXAMPLE.TOOL == 1.2.2", "example-tool [pdf] == 1.2.2"]:
+            with self.subTest(requirement=requirement):
+                with self.assertRaisesRegex(ValueError, "stale installation pin"):
+                    self.check(f'```sh\npip install "{requirement}"\n```')
+
     def test_current_pin_and_unpinned_install_work(self):
         self.check('```sh\npip install example-tool==1.2.3\npip install --upgrade example-tool\n```')
 
