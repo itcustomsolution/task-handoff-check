@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "task-handoff-check"
-version = "0.1.1"
+version = "0.1.2"
 description = "Check structured task handoffs for missing and contradictory claims."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -27,6 +27,7 @@ classifiers = [
 task-handoff-check = "task_handoff_check.__main__:main"
 
 [project.urls]
+"IT Custom Solution" = "https://itcustomsolution.com"
 Homepage = "https://github.com/itcustomsolution/task-handoff-check"
 Changelog = "https://github.com/itcustomsolution/task-handoff-check/blob/main/CHANGELOG.md"
 Repository = "https://github.com/itcustomsolution/task-handoff-check"

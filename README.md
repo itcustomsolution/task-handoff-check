@@ -209,6 +209,8 @@ Use a passing report to start the next person's review: they still need to inspe
 
 For help mapping one IT workflow's owners, exceptions and evidence gaps, see ITC's [IT Operations Workflow Review](https://itcustomsolution.com/practices/consulting). The outcome is a practical improvement brief, with optional AI readiness where relevant. Implementation and ongoing operation are separately scoped.
 
+The review covers one workflow: process map, exceptions, evidence gaps, ownership and access, prioritized actions, and handover. An automation brief is included only if justified. Scope, timing and fees follow inquiry; implementation is separate.
+
 ## Contributing
 
 Issues and small pull requests are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md). Run `python -m unittest discover -s tests` before opening a PR. Release history is in [CHANGELOG.md](CHANGELOG.md).
